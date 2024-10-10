@@ -47,6 +47,11 @@ class MonitoredEntityFilter(DynatraceObject):
 
 
 class Scope(DynatraceObject):
+    @staticmethod
+    def create(entities, matches):
+        raw_element= {"entities": entities, "matches": matches}
+        return Scope(raw_element=raw_element)
+
     def _create_from_raw_data(self, raw_element):
         self.entities: List[str] = raw_element.get("entities")
         self.matches: Optional[List[MonitoredEntityFilter]] = [MonitoredEntityFilter(raw_element=m) for m in raw_element.get("matches")]
@@ -212,6 +217,10 @@ class MaintenanceWindowService:
             else None
         )
         return Schedule.create(recurrence_type, start, end, zone_id, recurrence)
+
+    def create_scope(self, entities, matches) -> "Scope":
+        """ Create a scope to be used when creating a maintenance window. """
+        return Scope.create(entities, matches)
 
     def create(
         self,
